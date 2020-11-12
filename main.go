@@ -152,7 +152,13 @@ func main() {
 	log.Printf("INFO: Refreshing temporary credentials for %s profile", args.profile)
 
 	client := sts_client(permanent)
+
 	mfa_serial := get_ini_val(perm_profile, "mfa_serial").String()
+	if len(mfa_serial) == 0 {
+		log.Printf("ERROR: couldnt mfa_serial ARN in %s aws credentials section\n", perm_profile)
+		os.Exit(1)
+	}
+
 	mfa_token := get_mfa_token(mfa_serial)
 	credentials := get_session_creds(client, mfa_serial, mfa_token)
 	write_creds(args.profile, credentials)
