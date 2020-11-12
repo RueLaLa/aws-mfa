@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -114,6 +115,7 @@ type Args struct {
 	profile string
 	force   bool
 	suffix  string
+	version bool
 }
 
 func parse_args() Args {
@@ -124,12 +126,30 @@ func parse_args() Args {
 	flag.BoolVar(&a.force, "f", false, "force MFA recreation regardless of existing tokens")
 	flag.StringVar(&a.suffix, "suffix", "permanent", "suffix to match to find static credentials file")
 	flag.StringVar(&a.suffix, "s", "permanent", "suffix to match to find static credentials file")
+	flag.BoolVar(&a.version, "version", false, "print out version information")
+	flag.BoolVar(&a.version, "v", false, "print out version information")
 	flag.Parse()
 	return a
 }
 
+// these get passed in as ldflags by goreleaser
+var version string
+var commit string
+var date string
+
+func print_versions() {
+	go_version := runtime.Version()
+	fmt.Println(fmt.Sprintf("aws_mfa %s built with %s on commit %s at %s", version, go_version, commit, date))
+	os.Exit(0)
+}
+
 func main() {
 	args := parse_args()
+
+	if args.version {
+		print_versions()
+	}
+
 	log.SetFlags(log.Ltime)
 	perm_profile := fmt.Sprintf("%s-%s", args.profile, args.suffix)
 
