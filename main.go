@@ -175,8 +175,9 @@ func main() {
 	client := sts_client(permanent)
 
 	mfa_serial := get_ini_val(perm_profile, "mfa_serial").String()
-	if !arn.IsARN(mfa_serial) {
-		log.Printf("ERROR: couldnt mfa_serial ARN in %s aws credentials section\n", perm_profile)
+	_, err := arn.Parse(mfa_serial)
+	if err != nil {
+		log.Printf("ERROR: mfa_serial ARN in %s aws credentials - %s", perm_profile, err)
 		os.Exit(1)
 	}
 
