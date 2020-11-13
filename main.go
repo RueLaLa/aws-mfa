@@ -31,6 +31,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/aws/aws-sdk-go-v2/service/sts/types"
@@ -174,7 +175,7 @@ func main() {
 	client := sts_client(permanent)
 
 	mfa_serial := get_ini_val(perm_profile, "mfa_serial").String()
-	if len(mfa_serial) == 0 {
+	if !arn.IsARN(mfa_serial) {
 		log.Printf("ERROR: couldnt mfa_serial ARN in %s aws credentials section\n", perm_profile)
 		os.Exit(1)
 	}
