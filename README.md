@@ -18,6 +18,13 @@ the tool looks for a permanent profile using a suffix rather than generating a t
 
 Head over to [releases](https://github.com/RueLaLa/aws-mfa/releases) and download the latest version for your OS/Architecture, and place the extracted binary in your PATH.
 
+### MacOS
+
+You may run into an issue with MacOS gatekeeper blocking you from running the application because it is "unverified". If you run into that, you can add the application to the approved list by running this in your terminal of choice
+```
+sudo spctl --add /path/to/aws-mfa
+```
+
 ## Usage
 ```
 $ ./aws-mfa -h
