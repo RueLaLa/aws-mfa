@@ -1,5 +1,5 @@
 // Copyright © 2018 Daniel Ng <dan@RueLaLa.com>
-// Copyright © 2020 Nick Silverman <nckslvrmn@gmail.com>
+// Copyright © 2020-2021 Nick Silverman <nckslvrmn@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,11 +41,13 @@ import (
 func panic(err error) {
 	if err != nil {
 		log.Printf("ERROR: %s\n", err)
+		os.Exit(1)
 	}
 }
 
 func get_config(profile string) aws.Config {
 	cfg, err := config.LoadDefaultConfig(
+		context.TODO(),
 		config.WithSharedConfigProfile(profile),
 		config.WithSharedConfigFiles(
 			[]string{
