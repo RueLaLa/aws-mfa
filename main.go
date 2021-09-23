@@ -142,7 +142,7 @@ var date string
 
 func print_versions() {
 	go_version := runtime.Version()
-	fmt.Println(fmt.Sprintf("aws_mfa %s built with %s on commit %s at %s", version, go_version, commit, date))
+	fmt.Printf("aws_mfa %s built with %s on commit %s at %s\n", version, go_version, commit, date)
 	os.Exit(0)
 }
 
