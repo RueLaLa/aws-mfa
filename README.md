@@ -25,6 +25,13 @@ You may run into an issue with MacOS gatekeeper blocking you from running the ap
 sudo spctl --add /path/to/aws-mfa
 ```
 
+Additionally, MacOS may complain about this being malicious software:
+
+<img width="263" alt="malicious-error" src="https://user-images.githubusercontent.com/8377014/190272917-06a11f3e-9419-41ed-89d7-961c4218899a.png">
+
+Fix this by going into System Preferences -> Security & Privacy, and allowing this app.
+
+
 ## Usage
 ```
 $ ./aws-mfa -h
