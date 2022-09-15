@@ -1,5 +1,5 @@
 // Copyright © 2018 Daniel Ng <dan@RueLaLa.com>
-// Copyright © 2020-2021 Nick Silverman <nckslvrmn@gmail.com>
+// Copyright © 2020-2022 Nick Silverman <nckslvrmn@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,6 @@ package main
 import (
 	"bufio"
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -36,6 +35,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/aws/aws-sdk-go-v2/service/sts/types"
 	"github.com/go-ini/ini"
+	"github.com/integrii/flaggy"
 )
 
 func panic(err error) {
@@ -45,7 +45,7 @@ func panic(err error) {
 	}
 }
 
-func get_config(profile string) aws.Config {
+func build_config(profile string) aws.Config {
 	cfg, err := config.LoadDefaultConfig(
 		context.TODO(),
 		config.WithSharedConfigProfile(profile),
@@ -118,20 +118,15 @@ type Args struct {
 	profile string
 	force   bool
 	suffix  string
-	version bool
 }
 
 func parse_args() Args {
-	a := Args{}
-	flag.StringVar(&a.profile, "profile", "default", "profile to create MFA creds with")
-	flag.StringVar(&a.profile, "p", "default", "profile to create MFA creds with")
-	flag.BoolVar(&a.force, "force", false, "force MFA recreation regardless of existing tokens")
-	flag.BoolVar(&a.force, "f", false, "force MFA recreation regardless of existing tokens")
-	flag.StringVar(&a.suffix, "suffix", "permanent", "suffix to match to find static credentials file")
-	flag.StringVar(&a.suffix, "s", "permanent", "suffix to match to find static credentials file")
-	flag.BoolVar(&a.version, "version", false, "print out version information")
-	flag.BoolVar(&a.version, "v", false, "print out version information")
-	flag.Parse()
+	a := Args{"default", false, "permanent"}
+	flaggy.String(&a.profile, "p", "profile", "profile to create MFA creds with")
+	flaggy.Bool(&a.force, "f", "force", "force MFA recreation regardless of existing tokens")
+	flaggy.String(&a.suffix, "suffix", "permanent", "suffix to match to find static credentials file")
+	flaggy.SetVersion(print_version())
+	flaggy.Parse()
 	return a
 }
 
@@ -140,24 +135,17 @@ var version string
 var commit string
 var date string
 
-func print_versions() {
+func print_version() string {
 	go_version := runtime.Version()
-	fmt.Printf("aws_mfa %s built with %s on commit %s at %s\n", version, go_version, commit, date)
-	os.Exit(0)
+	return fmt.Sprintf("aws_mfa %s built with %s on commit %s at %s", version, go_version, commit, date)
 }
 
 func main() {
 	args := parse_args()
-
-	if args.version {
-		print_versions()
-	}
-
 	log.SetFlags(log.Ltime)
-	perm_profile := fmt.Sprintf("%s-%s", args.profile, args.suffix)
 
+	perm_profile := fmt.Sprintf("%s-%s", args.profile, args.suffix)
 	// get permanent credentials info
-	permanent := get_config(perm_profile)
 	if !ini_section_exists(perm_profile) {
 		log.Printf("ERROR: couldnt find %s profile in aws credentials file\n", perm_profile)
 		os.Exit(1)
@@ -172,9 +160,9 @@ func main() {
 			os.Exit(0)
 		}
 	}
-	log.Printf("INFO: Refreshing temporary credentials for %s profile", args.profile)
 
-	client := sts_client(permanent)
+	client := sts_client(build_config(perm_profile))
+	log.Printf("INFO: Refreshing temporary credentials for %s profile", args.profile)
 
 	mfa_serial := get_ini_val(perm_profile, "mfa_serial").String()
 	_, err := arn.Parse(mfa_serial)
