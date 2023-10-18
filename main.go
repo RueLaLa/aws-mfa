@@ -1,5 +1,5 @@
 // Copyright © 2018 Daniel Ng <dan@RueLaLa.com>
-// Copyright © 2020-2022 Nick Silverman <nckslvrmn@gmail.com>
+// Copyright © 2020-2023 Nick Silverman <nckslvrmn@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
