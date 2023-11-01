@@ -1,5 +1,5 @@
 builds:
-  - main: main.go
+  - main: ./cmd/aws-mfa/main.go
     goos:
       - darwin
       - linux
@@ -7,6 +7,11 @@ builds:
     goarch:
       - amd64
       - arm64
+    ldflags:
+      - -s -w -X github.com/ruelala/aws-mfa/pkg/utils.binary=aws-mfa
+      - -s -w -X github.com/ruelala/aws-mfa/pkg/utils.commit={{.Commit}}
+      - -s -w -X github.com/ruelala/aws-mfa/pkg/utils.date={{.Date}}
+      - -s -w -X github.com/ruelala/aws-mfa/pkg/utils.version={{.Version}}
 
 changelog:
   sort: desc
